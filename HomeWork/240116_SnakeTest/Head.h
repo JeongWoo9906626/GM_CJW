@@ -1,8 +1,8 @@
 #pragma once
-#include "Part.h"
+#include <ConsoleEngine/ConsoleObject.h>
 #include <vector>
 
-class Head : public Part
+class Head : public ConsoleObject
 {
 public:
 	void Move();

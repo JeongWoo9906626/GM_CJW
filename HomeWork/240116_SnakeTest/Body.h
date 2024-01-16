@@ -1,7 +1,7 @@
 #pragma once
-#include "Part.h"
+#include <ConsoleEngine/ConsoleObject.h>
 
-class Body : public Part
+class Body : public ConsoleObject
 {
 };
 

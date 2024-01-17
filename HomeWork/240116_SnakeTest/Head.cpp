@@ -4,8 +4,6 @@
 #include "BodyManager.h"
 #include "Body.h"
 
-// 2. 내가 이동을 해서 CurBody를 획득했다면 그 다음부터 그 바디는 나를 따라와야 한다.
-
 void Head::Move()
 {
 	int BodyCount = TailBody.size();
@@ -31,15 +29,50 @@ void Head::Move()
 	}
 }
 
+void Head::BodyCollisionCheck()
+{
+	int TailSize = TailBody.size();
+	int2 HeadPos = GetPos();
+
+	for (int i = 0; i < TailSize; i++)
+	{
+		int2 TailPos = TailBody[i]->GetPos();
+
+		if (TailPos == HeadPos)
+		{
+			GetCore()->EngineEnd();
+		}
+	}
+}
+
+void Head::WallCollisionCheck()
+{
+	int2 HeadPos = GetPos();
+
+	int ScreenX = GetCore()->Screen.GetScreenX();
+	int ScreenY = GetCore()->Screen.GetScreenY();
+
+	if (0 > HeadPos.Y || HeadPos.Y >= ScreenY)
+	{
+		GetCore()->EngineEnd();
+	}
+	if (0 > HeadPos.X || HeadPos.X >= ScreenX)
+	{
+		GetCore()->EngineEnd();
+	}
+}
+
 void Head::Update()
 {
 	int InputCount = _kbhit();
-	if (0 == InputCount)
+	int Select = 0;
+	while (0 < InputCount)
 	{
-		return;
+		Select = _getch();
+		InputCount = _kbhit();
 	}
 
-	int Select = _getch();
+
 	int2 CurDir = { 0, 0 };
 
 	switch (Select)
@@ -66,15 +99,24 @@ void Head::Update()
 	default:
 		break;
 	}
+
+	if (int2{ 0,0 } == CurDir)
+	{
+		CurDir = PrevDir;
+	}
+
 	int2 MoveDir = { 0, 0 };
 	if (TailBody.size() != 0)
 	{
 		MoveDir = TailBody[TailBody.size() - 1]->GetPos();
 	}
+
 	if (CurDir != PrevDir * -1)
 	{
 		Move();
 		AddPos(CurDir);
+		WallCollisionCheck();
+		BodyCollisionCheck();
 		PrevDir = CurDir;
 	}
 
@@ -103,5 +145,5 @@ void Head::Update()
 
 		int a = 0;
 	}
-
 }
+
